@@ -35,7 +35,8 @@ public class ClienteController {
         Cliente clienteSalvo = clientes.save(cliente);
         return ResponseEntity.ok(clienteSalvo);
     }
-
+    @DeleteMapping("/api/clientes/{id}")
+    @ResponseBody
     public ResponseEntity delete (@PathVariable Integer id) {
         Optional<Cliente> cliente = clientes.findById(id);
 
@@ -44,6 +45,18 @@ public class ClienteController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    @PutMapping("/api/clientes/{id}")
+    @ResponseBody
+    public ResponseEntity update (@PathVariable Integer id, @RequestBody Cliente cliente) {
+
+        return clientes
+                .findById(id)
+                .map(clienteExistente -> {
+                    cliente.setId(clienteExistente.getId());
+                    clientes.save(cliente);
+                    return ResponseEntity.noContent().build();
+                }).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }
