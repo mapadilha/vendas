@@ -2,7 +2,9 @@ package org.example.rest.controller;
 
 import org.example.domain.entity.ItemPedido;
 import org.example.domain.entity.Pedido;
+import org.example.domain.enums.StatusPedido;
 import org.example.domain.repository.Pedidos;
+import org.example.rest.dto.AtualizacaoStatusPedidoDTO;
 import org.example.rest.dto.InformacaoItemPedidoDTO;
 import org.example.rest.dto.InformacoesPedidoDTO;
 import org.example.rest.dto.PedidoDTO;
@@ -10,6 +12,7 @@ import org.example.service.PedidoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -33,6 +36,24 @@ public class PedidoController {
         Pedido pedido = service.salvar(dto);
         return pedido.getId();
     }
+
+    @GetMapping("{id}")
+    public InformacoesPedidoDTO getById (@PathVariable Integer id) {
+        return service
+                .obterPedidoCompleto(id)
+                .map( p -> converter(p) )
+                .orElseThrow( () ->
+                        new ResponseStatusException(NOT_FOUND, "Pedido não encontrado."));
+    }
+
+    @PatchMapping("{id}")
+    @ResponseStatus(NO_CONTENT)
+    public void updateStatus(@PathVariable Integer id, @RequestBody AtualizacaoStatusPedidoDTO dto) {
+        String novoStatus = dto.getNovoStatus();
+        service.atualizaStatus(id, StatusPedido.valueOf(novoStatus));
+    }
+
+
     private InformacoesPedidoDTO converter (Pedido pedido) {
         return InformacoesPedidoDTO
                 .builder()
