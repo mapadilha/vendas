@@ -1,5 +1,7 @@
 package org.example.config;
 
+import org.example.service.impl.UsuarioServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private UsuarioServiceImpl usuarioService;
     @Bean
     public PasswordEncoder passwordEncoder () {
         return new BCryptPasswordEncoder();
@@ -17,11 +22,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .passwordEncoder(passwordEncoder())
-                .withUser("michelle")
-                .password(passwordEncoder().encode("12321"))
-                .roles("USER");
+            auth
+                .userDetailsService(usuarioService)
+                .passwordEncoder(passwordEncoder());
     }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
