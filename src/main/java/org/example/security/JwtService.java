@@ -1,4 +1,4 @@
-package org.example;
+package org.example.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
