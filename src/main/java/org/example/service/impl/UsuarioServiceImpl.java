@@ -2,6 +2,7 @@ package org.example.service.impl;
 
 import org.example.domain.entity.Usuario;
 import org.example.domain.repository.UsuarioRepository;
+import org.example.exception.SenhaInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,16 @@ public class UsuarioServiceImpl implements UserDetailsService {
     public Usuario salvar(Usuario usuario) {
         return repository.save(usuario);
     }
+
+    public UserDetails autenticar (Usuario usuario) {
+        UserDetails user = loadUserByUsername(usuario.getLogin());
+        boolean senhaBatem = encoder.matches(usuario.getSenha(), user.getPassword());
+        if(senhaBatem) {
+            return user;
+        }
+        throw new SenhaInvalidException();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = repository.fingByLogin(username)
